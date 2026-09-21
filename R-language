@@ -138,6 +138,10 @@ WHERE e.grade = (
 
 Question 2
 mongobd
+if database not use the :
+
+use <database name>
+
 db.Students.insertMany([
   {
     "_id": ObjectId("60d5f1b2f1f1a13d1b9e3a71"),

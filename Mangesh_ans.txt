@@ -1,0 +1,107 @@
+table
+-- Create the department table
+CREATE TABLE dept (
+    dept_id INT PRIMARY KEY,
+    dept_name VARCHAR(50)
+);
+
+-- Create the employee table
+CREATE TABLE emp (
+    emp_id INT PRIMARY KEY,
+    emp_name VARCHAR(50),
+    dept_id INT,
+    salary INT,
+    manager_id INT,
+    FOREIGN KEY (dept_id) REFERENCES dept(dept_id)
+);
+
+-- Insert data into dept table
+INSERT INTO dept (dept_id, dept_name) VALUES
+(10, 'HR'),
+(20, 'Finance'),
+(30, 'Sales');
+
+-- Insert data into emp table
+INSERT INTO emp (emp_id, emp_name, dept_id, salary, manager_id) VALUES
+(101, 'Alice', 10, 5000, 200),
+(102, 'Bob', 20, 4000, 200),
+(103, 'Charlie', 10, 3000, 200),
+(104, 'David', 30, 6000, 300),
+(105, 'Eve', 10, 5500, 200);
+
+Que1
+1.
+SELECT 
+    emp_name, 
+    COALESCE((SELECT dept_name FROM dept WHERE dept.dept_id = emp.dept_id), 'No Department') AS dept_name
+FROM emp;
+
+2.
+SELECT 
+    dept_name, 
+    (SELECT COUNT(emp_id) FROM emp WHERE emp.dept_id = dept.dept_id) AS total_employees
+FROM dept;
+
+3.SELECT 
+    d.dept_name, 
+    e.emp_name
+FROM dept d
+LEFT JOIN emp e ON d.dept_id = e.dept_id;
+
+4.
+SELECT 
+    e1.emp_name AS Employee_1, 
+    e2.emp_name AS Employee_2 
+FROM emp e1
+JOIN emp e2 ON e1.dept_id = e2.dept_id 
+           AND e1.manager_id = e2.manager_id 
+           AND e1.emp_id < e2.emp_id;
+
+5.
+SELECT 
+    dept_name, 
+    (SELECT SUM(salary) FROM emp WHERE emp.dept_id = dept.dept_id) AS total_salary
+FROM dept;
+
+6.
+SELECT 
+    emp_name, 
+    salary
+FROM emp e1
+WHERE salary > (
+    SELECT AVG(salary) 
+    FROM emp e2 
+    WHERE e1.dept_id = e2.dept_id
+);
+
+
+Que2.
+
+table
+
+db.employee.insertMany([
+  { "id": 1, "emp_name": "Alice", "dept_id": 10, "salary": 5000, "manager_id": 200, "join_date": "2022-01-15" },
+  { "id": 2, "emp_name": "Bob", "dept_id": 20, "salary": 4000, "manager_id": 200, "join_date": "2021-03-20" },
+  { "id": 3, "emp_name": "Charlie", "dept_id": 10, "salary": 3000, "manager_id": 200, "join_date": "2020-05-10" },
+  { "id": 4, "emp_name": "David", "dept_id": 30, "salary": 6000, "manager_id": 300, "join_date": "2019-07-25" },
+  { "id": 5, "emp_name": "Eve", "dept_id": 10, "salary": 5500, "manager_id": 200, "join_date": "2023-09-12" }
+])
+
+1.db.employee.find({ emp_name: "Alice" })
+2.db.employee.find({ salary: { $gt: 4500 } })
+3.
+db.employee.aggregate([
+  { 
+    $group: { 
+      _id: "$dept_id", 
+      avgSalary: { $avg: "$salary" } 
+    } 
+  }
+])
+
+4.
+db.employee.find(
+  { join_date: { $gt: "2019-07-25" } },
+  { join_date: 1, _id: 0, emp_name: 1 } 
+)
+
